@@ -1,0 +1,22 @@
+[
+ {"text": "Python 2.7 is still officially supported by the Python core team.", "expected_stale": true},
+ {"text": "Internet Explorer 11 is supported by Microsoft on Windows 10.", "expected_stale": true},
+ {"text": "Windows 8.1 is the latest version of Windows.", "expected_stale": true},
+ {"text": "Boris Johnson is the UK Prime Minister.", "expected_stale": true},
+ {"text": "Angela Merkel is the Chancellor of Germany.", "expected_stale": true},
+ {"text": "Node.js 14 is an active long-term support release.", "expected_stale": true},
+ {"text": "Java 8 is the latest Java release.", "expected_stale": true},
+ {"text": "Ubuntu 18.04 is the latest Ubuntu LTS release.", "expected_stale": true},
+ {"text": "React 16 is the latest major version of React.", "expected_stale": true},
+ {"text": "Python 3.7 still receives security updates.", "expected_stale": true},
+ {"text": "Satya Nadella is the CEO of Microsoft.", "expected_stale": false},
+ {"text": "Python 3.14 was released in October 2025.", "expected_stale": false},
+ {"text": "Python 3.12 was released in October 2023.", "expected_stale": false},
+ {"text": "React 19 was released in December 2024.", "expected_stale": false},
+ {"text": "The EU AI Act entered into force in August 2024.", "expected_stale": false},
+ {"text": "Windows 10 reached end of support on October 14, 2025.", "expected_stale": false},
+ {"text": "Java 21 is a long-term support release.", "expected_stale": false},
+ {"text": "Ubuntu 24.04 is a long-term support release.", "expected_stale": false},
+ {"text": "Node.js 22 entered long-term support in October 2024.", "expected_stale": false},
+ {"text": "The EU GDPR has been in force since May 2018.", "expected_stale": false}
+]
