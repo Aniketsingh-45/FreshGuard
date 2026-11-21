@@ -1,10 +1,13 @@
 # FreshGuard: Stale-Answer Detector for AI Applications
 
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Docker](https://img.shields.io/badge/Docker-Supported-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 FreshGuard is a fact-checking layer designed to sit alongside your LLM gateway to detect outdated, contradicted, or stale information in AI-generated answers.
 
 Large Language Models answer with high confidence, but their internal knowledge is frozen at training cutoff. As real-world facts change—software releases move on, corporate leadership changes, laws are enacted, and prices fluctuate—AI answers can quickly become stale. FreshGuard identifies time-sensitive factual claims, verifies them against live web evidence, calculates an explainable freshness score (0–100), and provides corrected facts with source links.
-
-![FreshGuard Web UI — claim check in action](screenshot/image.png)
 
 ---
 
@@ -61,15 +64,26 @@ Bifrost acts as a local OpenAI-compatible gateway (`http://localhost:8080/v1`) t
 
 The screenshot below shows the Bifrost dashboard during a live benchmark run — 129 requests logged, both model tiers visible, latency and cost per request tracked in real time.
 
-![Bifrost Dashboard — live request logs during benchmark](screenshot/image copy.png)
+![Bifrost Dashboard — live request logs during benchmark](docs/image%20copy.png)
 
 ---
 
 ## Screenshots
 
-![screenshot](docs/image%20copy%202.png)
-![screenshot](docs/image%20copy.png)
-![screenshot](docs/image.png)
+### 1. FreshGuard Web UI
+Interactive dashboard verifying factual claims against live web sources, highlighting outdated information, and assigning freshness scores:
+
+![FreshGuard Web UI — Claim check in action](docs/image.png)
+
+### 2. Bifrost Gateway & Observability
+Live request logging and dual-tier model routing (`claude-haiku-5-5` for claim extraction and `claude-sonnet-5-5` for judging) with token and latency tracking:
+
+![Bifrost Dashboard — Live request logs during benchmark](docs/image%20copy.png)
+
+### 3. Verification Benchmark Output
+Terminal evaluation results from `benchmark.py` running on the 20-claim dataset with Tavily search and Bifrost:
+
+![Benchmark Output — Precision, Recall, and Accuracy](docs/image%20copy%202.png)
 
 ---
 
@@ -161,7 +175,7 @@ On this small set, adding live search raised recall from 0.80 to 1.00. Results d
 
 The screenshot below shows actual terminal output from `benchmark.py` on the 20-claim dataset:
 
-![Benchmark output — precision=1.00, recall=1.00, accuracy=1.00](screenshot/image copy 2.png)
+![Benchmark output — precision=1.00, recall=1.00, accuracy=1.00](docs/image%20copy%202.png)
 
 ---
 
