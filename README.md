@@ -34,7 +34,7 @@ Large Language Models answer with extreme confidence, yet their internal paramet
 
 ---
 
-## 🏗️ Architecture & Verification Pipeline
+## How It Works
 
 ```text
 +-------------------------------------------------------------------------+
@@ -72,6 +72,22 @@ Large Language Models answer with extreme confidence, yet their internal paramet
 
 ---
 
+## Ask and Fix
+
+`POST /ask` gets an answer from a fast model through Bifrost, FreshGuard checks its claims against live Tavily results, and a stronger model rewrites the answer using only the verified corrections. Claims are now checked in parallel.
+
+#### 1. Fast Answer Generation & Parallel Claim Verification
+The fast model generates the initial response, and FreshGuard extracts and verifies its factual claims in parallel against live Tavily search evidence:
+
+![Ask and Fix — Initial AI Answer and Parallel Verification](docs/Screenshot%202026-11-21%20203007.png)
+
+#### 2. Evidence-Grounded Answer Rewriting
+If any claims are outdated or contradicted, the judge model rewrites the answer using strictly the verified facts:
+
+![Ask and Fix — Verified Rewritten Answer](docs/Screenshot%202026-11-21%20203035.png)
+
+---
+
 ## ⚡ Mandatory Technology Integration
 
 ### 1. Tavily Search API — Precision Real-Time Evidence
@@ -96,22 +112,11 @@ The screenshot below displays the Bifrost dashboard capturing 129 live benchmark
 
 ---
 
-## 📸 System Showcase & Screenshots
+## 📸 FreshGuard Interactive Web UI
 
-### 1. FreshGuard Interactive Web UI
-Users can input any AI-generated response to receive an instant claim-by-claim breakdown with confidence scores, status badges, corrected facts, and direct web evidence links:
+The standalone web interface allows users to check any arbitrary AI response against live web sources, highlighting outdated or contradicted information with explainable freshness scores and direct source links:
 
 ![FreshGuard Web UI — Real-time Claim Verification](docs/image.png)
-
-### 2. Bifrost Gateway & Observability Dashboard
-Enterprise-grade observability showing request volume, dual-model latency tracking, and granular token analytics:
-
-![Bifrost Dashboard — Live request logs during benchmark](docs/image%20copy.png)
-
-### 3. Benchmark Verification Output
-Terminal execution output of `benchmark.py` demonstrating flawless 100% precision, recall, and accuracy across real-world test sets:
-
-![Benchmark Output — Precision, Recall, and Accuracy](docs/image%20copy%202.png)
 
 ---
 

@@ -7,6 +7,7 @@ All LLM calls go through the Bifrost gateway (OpenAI-compatible API).
 import json
 import os
 import re
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 
 from dotenv import load_dotenv
@@ -21,6 +22,7 @@ load_dotenv()
 BIFROST_URL = os.getenv("BIFROST_URL", "http://localhost:8080/v1")
 EXTRACTOR_MODEL = os.getenv("EXTRACTOR_MODEL", "anthropic/claude-haiku-5-5")
 JUDGE_MODEL = os.getenv("JUDGE_MODEL", "anthropic/claude-sonnet-5-5")
+ANSWER_MODEL = os.getenv("ANSWER_MODEL", EXTRACTOR_MODEL)  # the "chatbot" that may be stale
 
 # The provider key lives only inside Bifrost, so the app uses a dummy key.
 llm = OpenAI(base_url=BIFROST_URL, api_key="not-needed")
@@ -129,15 +131,72 @@ def run_check(text: str, max_claims: int = 6) -> dict:
     except Exception as exc:  # e.g. Bifrost not running
         return {"checked_on": date.today().isoformat(), "claims": [],
                 "error": f"Failed to extract claims: {exc}"}
-    return {
-        "checked_on": date.today().isoformat(),
-        "claims": [check_claim(c) for c in claims],
-    }
+    with ThreadPoolExecutor(max_workers=3) as pool:  # claims are independent
+        results = list(pool.map(check_claim, claims))  # keeps the original order
+    return {"checked_on": date.today().isoformat(), "claims": results}
 
 
 @app.post("/check")
 def check(req: CheckRequest):
     return run_check(req.text, req.max_claims)
+
+
+class AskRequest(BaseModel):
+    question: str
+    max_claims: int = 5
+
+
+def answer_question(question: str) -> str:
+    """The 'AI app' whose answer we verify. Uses the cheap model through Bifrost."""
+    resp = llm.chat.completions.create(
+        model=ANSWER_MODEL,
+        temperature=0,
+        max_tokens=500,
+        messages=[
+            {"role": "system", "content": "Answer in 3-5 sentences. Be specific: give "
+             "versions, prices, dates and names where relevant."},
+            {"role": "user", "content": question},
+        ],
+    )
+    return resp.choices[0].message.content.strip()
+
+
+def fix_answer(question: str, answer: str, claims: list) -> str:
+    """Rewrite the answer using only the verified corrections. No stale claims -> unchanged."""
+    stale = [c for c in claims
+             if c.get("verdict") in ("outdated", "contradicted") and c.get("corrected_fact")]
+    if not stale:
+        return answer
+    corrections = [{"wrong_claim": c["claim"], "verified_fact": c["corrected_fact"],
+                    "source": c.get("best_source_url")} for c in stale]
+    resp = llm.chat.completions.create(
+        model=JUDGE_MODEL,
+        temperature=0,
+        max_tokens=600,
+        messages=[
+            {"role": "system", "content": f"Today is {date.today().isoformat()}. Rewrite the "
+             "answer so it is correct. Change only what the verified corrections cover, use "
+             "no other new facts, and keep it short. Reply with the rewritten answer only."},
+            {"role": "user", "content": json.dumps(
+                {"question": question, "answer": answer, "corrections": corrections})},
+        ],
+    )
+    return resp.choices[0].message.content.strip()
+
+
+@app.post("/ask")
+def ask(req: AskRequest):
+    try:
+        answer = answer_question(req.question)
+    except Exception as exc:  # e.g. Bifrost not running
+        return {"error": f"Could not get an answer: {exc}"}
+    check = run_check(answer, req.max_claims)
+    try:
+        fixed = fix_answer(req.question, answer, check["claims"])
+    except Exception:
+        fixed = None
+    return {"question": req.question, "answer": answer, "check": check,
+            "corrected_answer": fixed, "changed": bool(fixed) and fixed != answer}
 
 
 @app.get("/health")
