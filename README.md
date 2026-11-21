@@ -65,6 +65,14 @@ The screenshot below shows the Bifrost dashboard during a live benchmark run —
 
 ---
 
+## Screenshots
+
+![screenshot](docs/image%20copy%202.png)
+![screenshot](docs/image%20copy.png)
+![screenshot](docs/image.png)
+
+---
+
 ## Windows Setup
 
 ### Prerequisites
